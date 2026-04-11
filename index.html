@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ระบบบันทึกสายบุญ</title>
+  <title></title>
   
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   
@@ -22,7 +22,7 @@
             'primary-light': '#d1c4e9',
             success: '#34A853',
             magenta: '#ff00ff',
-            accent: '#ff9800' // สีส้มสำหรับการกรอก
+            accent: '#ff9800' // สีส้มสำหรับการ Focus
           }
         }
       }
@@ -32,117 +32,127 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   
   <style>
-    * { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     
-    /* Input Style กับลูกเล่นสีส้ม */
+    /* Material Input Style */
     .material-input {
-      border-bottom: 1px solid #e5e7eb;
-      padding: 16px 0 4px 0;
+      border-bottom: 2px solid #e0e0e0;
+      padding: 18px 0 4px 0;
       width: 100%;
-      font-size: 16px;
-      font-weight: 200;
+      font-size: 15px;
       outline: none;
       background: transparent;
       border-radius: 0;
-      transform: scaleY(1.15); 
-      transform-origin: left bottom;
     }
-    /* เมื่อกำลังกรอก (Focus) เส้นจะเป็นสีส้ม */
-    .material-input:focus { border-bottom: 2px solid #ff9800; }
+    /* ลูกเล่น: กำลังกรอกเป็นสีส้ม */
+    .material-input:focus { border-bottom-color: #ff9800; }
     
     .material-label {
       position: absolute;
-      top: 16px; left: 0;
-      font-size: 15px; font-weight: 200;
-      color: #9ca3af; pointer-events: none;
-      transform: scaleY(1.1); transform-origin: left bottom;
+      top: 18px;
+      left: 0;
+      font-size: 15px;
+      color: #757575;
+      pointer-events: none;
     }
+    /* ปรับสี Label ตามสถานะ Focus (สีส้ม) หรือกรอกแล้ว (สีม่วง) */
     .material-input:focus + .material-label {
-      top: 0; font-size: 11px; color: #ff9800; font-weight: 400; transform: scaleY(1);
+      top: 0; font-size: 11px; color: #ff9800; font-weight: 500;
     }
     .material-input:not(:placeholder-shown) + .material-label {
-      top: 0; font-size: 11px; color: #6200ea; font-weight: 400; transform: scaleY(1);
+      top: 0; font-size: 11px; color: #6200ea; font-weight: 500;
     }
 
+    /* Loader */
     .loader-container {
       display: flex; flex-direction: column; justify-content: center; align-items: center;
-      height: 100vh; background-color: #ffffff;
+      height: 100vh; background-color: #f8f9fa;
     }
     .spinner {
-      width: 30px; height: 30px; border: 2px solid #f3f4f6;
-      border-top: 2px solid #7c3aed; border-radius: 50%;
+      width: 40px; height: 40px; border: 4px solid #e5e7eb;
+      border-top: 4px solid #7c3aed; border-radius: 50%;
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900 font-sans antialiased font-[200]">
+<body class="bg-gray-50 text-gray-900 font-sans antialiased">
 
   <div id="app" class="min-h-screen">
     
     <div v-if="!isLoaded" class="loader-container">
       <div class="spinner"></div>
-      <div class="mt-4 text-gray-400 text-[10px] tracking-[0.3em] uppercase">Loading System</div>
+      <div class="mt-4 text-gray-500 text-sm">กำลังเปิดสะพานบุญ...</div>
     </div>
 
     <div v-show="isLoaded">
-      <header class="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-5 py-4 flex items-center justify-between">
-          <h1 class="text-lg font-[300] tracking-tight transform scale-y-110 origin-left">🙏 บันทึกสายบุญ</h1>
-          <span class="text-[9px] text-gray-300 tracking-[0.2em]">LIFF V2.5</span>
+      <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
+          <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">LIFF MODE</div>
         </div>
       </header>
 
-      <main class="p-3 max-w-4xl mx-auto pb-44">
-        <form @submit.prevent="submitForm" class="space-y-3">
+      <main class="p-3 max-w-4xl mx-auto pb-48">
+        <form @submit.prevent="submitForm" class="space-y-4">
           
           <div v-for="(person, index) in donors" :key="index" 
-               class="bg-white rounded-2xl p-4 pt-6 shadow-sm border border-gray-50 relative">
+               class="bg-white rounded-2xl p-4 pt-6 shadow-sm border border-gray-100 relative">
             
             <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
-                    title="กดเพื่อลบรายการนี้"
-                    class="absolute -top-1 -right-1 bg-red-50 text-red-500 rounded-full p-1.5 shadow-sm hover:bg-red-500 hover:text-white transition-all active:scale-90 z-10">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+              title="กดเพื่อลบรายการนี้"
+              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-md active:scale-90 transition-all z-10">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
 
-            <div class="grid grid-cols-[30px_1fr_80px] gap-3 items-end">
-              <div class="flex justify-start pb-2">
-                <span class="text-primary-light font-[600] text-[10px]">
-                  {{ (index + 1).toString().padStart(2, '0') }}
+            <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
+              <div class="flex justify-start pb-1">
+                <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">
+                  {{ index + 1 }}
                 </span>
               </div>
+
               <div class="relative">
-                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required @focus="handleFocus" class="material-input">
+                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required
+                  @focus="handleFocus"
+                  class="material-input">
                 <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
               </div>
+
               <div class="relative">
-                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required @focus="handleFocus" class="material-input text-right pr-0 font-medium">
-                <label :for="'a-'+index" class="material-label w-full text-right">ยอดเงิน</label>
+                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required
+                  @focus="handleFocus"
+                  class="material-input font-bold text-right pr-0">
+                <label :for="'a-'+index" class="material-label w-full text-right font-normal">บาท</label>
               </div>
             </div>
           </div>
 
-          <button @click="addPerson" type="button" 
-                  class="w-full py-3 bg-white border border-dashed border-magenta/30 rounded-xl text-magenta font-[300] text-xs flex items-center justify-center active:scale-95 transition mt-4 uppercase tracking-[0.2em]">
-            + Add Next Person
+          <button @click="addPerson" type="button"
+            class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            เพิ่มรายชื่อคนต่อไป
           </button>
+
         </form>
       </main>
 
-      <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-100 p-5 pb-8 z-40">
-        <div class="max-w-4xl mx-auto flex items-center justify-between">
+      <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t p-4 pb-10 z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <div>
-            <p class="text-[9px] text-gray-400 font-[500] uppercase tracking-widest mb-0.5">Summary</p>
-            <p class="text-3xl font-[200] text-magenta tracking-tighter transform scale-y-110 origin-left">
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
+            <p class="text-2xl font-black text-magenta leading-tight">
               {{ totalAmount.toLocaleString() }} 
-              <span class="text-[10px] font-[300] text-gray-400 ml-1 uppercase">Baht</span>
+              <span class="text-xs font-normal text-gray-500">บาท</span>
             </p>
           </div>
-          <button @click="submitForm" 
-                  class="bg-success text-white px-10 py-3 rounded-full text-xs font-[400] tracking-widest uppercase active:scale-95 shadow-lg shadow-success/10">
-            Confirm & Close
+          <button @click="submitForm"
+            class="bg-success text-white px-12 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
+            กดบันทึก
           </button>
         </div>
       </div>
@@ -158,6 +168,7 @@
 
         onMounted(async () => {
           try {
+            // กรุณาเปลี่ยน YOUR_LIFF_ID เป็น ID จริงของคุณ
             await liff.init({ liffId: "2006880053-EAnG4Xay" }) 
             if (!liff.isLoggedIn()) {
               liff.login()
@@ -170,27 +181,42 @@
           }
         })
 
-        const totalAmount = computed(() => donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0))
-        const addPerson = () => donors.value.push({ name: '', amount: null })
-        const removePerson = (index) => donors.value.length > 1 && donors.value.splice(index, 1)
-        const handleFocus = (e) => setTimeout(() => e.target.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350)
+        const totalAmount = computed(() => {
+          return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+        })
+
+        const addPerson = () => {
+          donors.value.push({ name: '', amount: null })
+        }
+
+        const removePerson = (index) => {
+          if (donors.value.length > 1) donors.value.splice(index, 1)
+        }
+
+        const handleFocus = (event) => {
+          setTimeout(() => {
+            event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }, 400)
+        }
 
         const submitForm = async () => {
+          // ส่งข้อความเข้าแชท
           if (liff.isInClient()) {
             try {
               await liff.sendMessages([
                 {
                   type: 'text',
-                  text: `🙏 บันทึกสำเร็จ!\nยอดรวม: ${totalAmount.value.toLocaleString()} บาท\nจำนวน: ${donors.value.length} ท่าน`
+                  text: `🙏 บันทึกสายบุญเรียบร้อย!\nยอดรวม: ${totalAmount.value.toLocaleString()} บาท\nจำนวน: ${donors.value.length} ท่าน`
                 }
               ])
+              // ปิดหน้าต่าง LIFF
               liff.closeWindow()
             } catch (err) {
-              console.error("Error:", err)
+              console.error("Send Message Error", err)
               liff.closeWindow()
             }
           } else {
-            alert(`ยืนยันยอด ${totalAmount.value} บาท (ระบบปิดหน้าต่างทำงานเฉพาะใน LINE)`)
+            alert(`สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท (ระบบปิดหน้าต่างทำงานใน LINE เท่านั้น)`)
           }
         }
 
