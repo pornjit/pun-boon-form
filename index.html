@@ -2,29 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title></title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-
   <script src="https://cdn.tailwindcss.com"></script>
   
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Roboto', 'sans-serif'], // กำหนดฟอนต์หลัก
-          },
+          fontFamily: { sans: ['Roboto', 'sans-serif'] },
           colors: {
-            primary: '#6200ea', // สีม่วงหลัก (Deep Purple 600)
-            'primary-dark': '#3700b3', // สีม่วงเข้ม (Deep Purple 700)
-            'primary-light': '#b388ff', // สีม่วงอ่อน (Deep Purple 100)
-            secondary: '#03dac6', // สีเขียวน้ำทะเล (Teal 200)
-            success: '#34A853', // สีเขียวหลัก (Green 600)
-            'success-dark': '#1e7e34', // สีเขียวเข้ม (Green 700)
+            primary: '#6200ea',
+            'primary-dark': '#3700b3',
+            secondary: '#03dac6',
+            success: '#34A853'
           }
         }
       }
@@ -34,310 +29,162 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   
   <style>
-    /* ทำให้ทุกอย่างที่มีการเปลี่ยนแปลงสีหรือเงา ดูนุ่มนวล */
-    * {
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    /* สไตล์สำหรับ Floating Label */
-    .material-input-group {
-      position: relative;
-    }
-
+    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .material-input {
-      border: none;
       border-bottom: 2px solid #e0e0e0;
-      background-color: transparent;
-      padding-top: 24px;
-      padding-bottom: 8px;
+      padding: 18px 0 4px 0;
       width: 100%;
-      font-size: 16px;
-      color: #212121;
-    }
-
-    .material-input:focus {
+      font-size: 15px;
       outline: none;
-      border-bottom-color: #6200ea;
+      background: transparent;
     }
-
+    .material-input:focus { border-bottom-color: #6200ea; }
     .material-label {
       position: absolute;
-      top: 24px;
+      top: 18px;
       left: 0;
-      font-size: 16px;
+      font-size: 15px;
       color: #757575;
       pointer-events: none;
-      transition: all 0.2s ease;
     }
-
-    /* เมื่อ Input มีข้อมูลหรือถูก Focus ให้ Label ลอยขึ้น */
     .material-input:focus + .material-label,
     .material-input:not(:placeholder-shown) + .material-label {
       top: 0;
-      font-size: 12px;
+      font-size: 11px;
       color: #6200ea;
-      font-weight: 500;
+      font-weight: 600;
     }
-
-    /* สี Label สีแดงเมื่อมี Error (ถ้าต้องการเพิ่ม Validation) */
-    .material-input:invalid + .material-label {
-      color: #b00020;
+    .loader-container {
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      height: 100vh; background-color: #f3f4f6;
     }
-
-    /* ปรับแต่ง Scrollbar ให้ดูมินิมอล */
-    ::-webkit-scrollbar {
-      width: 8px;
+    .spinner {
+      width: 40px; height: 40px; border: 4px solid #e5e7eb;
+      border-top: 4px solid #7c3aed; border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #a1a1a1;
-    }
-
-    /* Simulated Ripple Effect on Buttons */
-    .material-button {
-      position: relative;
-      overflow: hidden;
-    }
-    .material-button:after {
-      content: "";
-      background: rgba(255, 255, 255, 0.3);
-      display: block;
-      position: absolute;
-      border-radius: 50%;
-      padding-top: 300%;
-      padding-left: 300%;
-      margin-left: -150% !important;
-      margin-top: -150%;
-      opacity: 0;
-      transition: all 0.8s;
-    }
-    .material-button:active:after {
-      padding-top: 0;
-      padding-left: 0;
-      margin-left: 0 !important;
-      margin-top: 0;
-      opacity: 1;
-      transition: 0s;
-    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased">
 
   <div id="app" class="min-h-screen">
+    <div v-if="!isLoaded" class="loader-container">
+      <div class="spinner"></div>
+      <div class="loading-text mt-4 text-gray-500">กำลังเข้าสู่หน้างานบุญ...</div>
+    </div>
 
-    <style>
-    .loader-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #f3f4f6; /* สีพื้นหลังอ่อนๆ */
-      font-family: sans-serif;
-    }
-    .spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid #e5e7eb;
-      border-top: 5px solid #7c3aed; /* สีม่วงเดียวกับ Header ของเรา */
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .loading-text {
-      margin-top: 15px;
-      color: #6b7280;
-      font-size: 14px;
-      letter-spacing: 1px;
-    }
-  </style>
-
-  <div class="loader-container">
-    <div class="spinner"></div>
-    <div class="loading-text">รอสักครู่ กำลังโหลด...</div>
-  </div>
-    
-    <header class="bg-primary text-white shadow-lg sticky top-0 z-50 overflow-hidden">
-      <div class="max-w-7xl mx-auto px-4 py-6 md:px-8 flex items-center justify-between">
-        <div class="flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <h1 class="text-2xl font-bold tracking-tight">รายชื่อผู้ร่วมทำบุญ</h1>
+    <div v-show="isLoaded">
+      <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div class="flex items-center">
+            <h1 class="text-xl font-bold">🙏 บันทึกสายบุญ</h1>
+          </div>
+          <div class="text-xs bg-primary-dark px-3 py-1 rounded-full text-primary-light">V.2026</div>
         </div>
-        <p class="text-primary-light font-medium text-sm hidden md:block">กรุณากรอกข้อมูลเพื่อสรุปยอด</p>
-      </div>
-    </header>
+      </header>
 
-    <main class="p-4 md:p-10 max-w-7xl mx-auto">
-      <form @submit.prevent="submitForm" class="space-y-10">
-        
-        <div class="space-y-8">
-          <div v-for="(person, index) in donors" :key="index" class="bg-white rounded-2xl p-8 relative shadow-md transition hover:shadow-xl group border border-gray-100">
+      <main class="p-3 md:p-8 max-w-4xl mx-auto pb-40">
+        <form @submit.prevent="submitForm" class="space-y-3">
+          
+          <div v-for="(person, index) in donors" :key="index" 
+               class="bg-white rounded-xl p-3 pr-10 shadow-sm border border-gray-100 relative group">
             
-            <button 
-              v-if="donors.length > 1"
-              @click="removePerson(index)"
-              type="button"
-              class="absolute top-4 right-4 text-gray-400 rounded-full w-10 h-10 flex items-center justify-center hover:bg-red-50 hover:text-red-500 transition-all focus:outline-none focus:ring-2 focus:ring-red-200"
-              title="ลบรายชื่อนี้"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
+            <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
+              class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-300 hover:text-red-400">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
 
-            <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+            <div class="grid grid-cols-[35px_1fr_90px] gap-3 items-end">
               
-              <div class="md:col-span-1 flex items-center justify-center pt-6">
-                <span class="bg-primary-light text-primary rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-inner group-hover:scale-110 transition">
-                  {{ (index + 1) }}
-                </span>
+              <div class="pb-1 text-center">
+                <span class="text-primary font-bold text-lg">{{ index + 1 }}.</span>
               </div>
 
-              <div class="md:col-span-7 material-input-group">
-                <input 
-                  :id="'name-' + index"
-                  v-model="person.name"
-                  type="text"
-                  placeholder=" "
-                  required
-                  class="material-input hover:border-gray-400"
-                >
-                <label :for="'name-' + index" class="material-label">ชื่อ-นามสกุล</label>
+              <div class="relative">
+                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required
+                  @focus="handleFocus"
+                  class="material-input">
+                <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
               </div>
 
-              <div class="md:col-span-4 material-input-group relative">
-                <div class="absolute bottom-10 left-0 flex items-center pointer-events-none pr-2">
-                  <span class="text-gray-400 font-medium text-lg">฿</span>
-                </div>
-                <input 
-                  :id="'amount-' + index"
-                  v-model.number="person.amount"
-                  type="number"
-                  min="1"
-                  placeholder=" "
-                  required
-                  class="material-input pl-6 hover:border-gray-400 font-medium text-lg"
-                >
-                <label :for="'amount-' + index" class="material-label pl-6">ยอดเงิน (บาท)</label>
+              <div class="relative">
+                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required
+                  @focus="handleFocus"
+                  class="material-input font-bold text-right pr-1">
+                <label :for="'a-'+index" class="material-label w-full text-right">ยอดเงิน</label>
+                <span class="absolute right-0 bottom-1 text-[10px] text-gray-400">฿</span>
               </div>
-
             </div>
           </div>
-        </div>
 
-        <div class="text-center pt-6">
-          <button 
-            @click="addPerson"
-            type="button"
-            class="material-button inline-flex items-center px-10 py-3 border-2 border-primary rounded-full text-lg font-semibold text-primary hover:bg-primary hover:text-white transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-primary-light overflow-hidden"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            เพิ่มรายชื่อคนต่อไป
-          </button>
-        </div>
-
-        <div class="bg-white rounded-3xl p-10 border border-gray-100 shadow-xl transition hover:shadow-2xl">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-10">
-            <div class="text-center md:text-left">
-              <p class="text-gray-500 text-sm font-medium tracking-wide uppercase">สรุปรายการทำบุญ</p>
-              <p class="text-5xl font-extrabold mt-3 text-gray-950 tracking-tighter">
-                {{ donors.length }} <span class="text-gray-400 font-medium text-3xl">คน</span> / <span class="text-primary">{{ totalAmount.toLocaleString('th-TH', { minimumFractionDigits: 2 }) }} <span class="text-primary-light font-medium text-3xl">บาท</span></span>
-              </p>
-            </div>
-            <button 
-              type="submit"
-              class="material-button w-full md:w-auto px-16 py-5 bg-success text-white text-xl font-bold rounded-full shadow-lg hover:bg-success-dark transform hover:-translate-y-1 transition-all active:scale-95 focus:outline-none focus:ring-4 focus:ring-green-300 overflow-hidden"
-            >
-              🙏 ยืนยันยอดทำบุญ
+          <div class="py-2">
+            <button @click="addPerson" type="button"
+              class="w-full py-3 border-2 border-dashed border-primary/30 rounded-xl text-primary font-medium flex items-center justify-center hover:bg-primary/5 active:bg-primary/10 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+              </svg>
+              เพิ่มรายชื่อ
             </button>
           </div>
-        </div>
 
-      </form>
-      
-      <div v-if="submittedData" class="mt-16 p-8 bg-white rounded-2xl border border-gray-100 shadow-inner">
-        <div class="flex items-center mb-6 pb-5 border-b border-gray-100">
-          <div class="bg-success text-white rounded-full p-4 mr-5 shadow-md">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
+        </form>
+      </main>
+
+      <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+          <div>
+            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">รวมทั้งสิ้น</p>
+            <p class="text-xl font-black text-primary">{{ totalAmount.toLocaleString() }} <span class="text-sm font-normal">บาท</span></p>
           </div>
-          <h3 class="text-2xl font-bold text-gray-900 tracking-tight">ข้อมูลที่ถูกส่งออก (JSON Structure)</h3>
+          <button @click="submitForm"
+            class="bg-success text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-success/30 active:scale-95 transition-all">
+            ยืนยันยอดบุญ
+          </button>
         </div>
-        <pre class="text-sm bg-gray-50 p-6 rounded-xl shadow-inner overflow-x-auto text-gray-700 font-mono leading-relaxed border border-gray-100">{{ JSON.stringify(submittedData, null, 2) }}</pre>
       </div>
-
-    </main>
-    
-    <footer class="mt-20 py-10 bg-gray-100 border-t border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm font-medium">
-        Powered by Vue.js 3 & Tailwind CSS | Material Design Edition for LINE LIFF
-      </div>
-    </footer>
-
+    </div>
   </div>
 
   <script>
-    const { createApp, ref, computed } = Vue
-
+    const { createApp, ref, computed, onMounted } = Vue
     createApp({
       setup() {
-        // ตัวแปรเก็บรายชื่อผู้ทำบุญ (Initial State มี 1 คน)
-        const donors = ref([
-          { name: '', amount: null }
-        ])
-
-        // ตัวแปรเก็บข้อมูลหลังกด Submit
+        const isLoaded = ref(false)
+        const donors = ref([{ name: '', amount: null }])
         const submittedData = ref(null)
 
-        // คำนวณยอดเงินรวมทั้งหมด
-        const totalAmount = computed(() => {
-          return donors.value.reduce((sum, person) => {
-            return sum + (Number(person.amount) || 0)
-          }, 0)
+        onMounted(() => {
+          setTimeout(() => { isLoaded.value = true }, 800)
         })
 
-        // ฟังก์ชันเพิ่มรายชื่อใหม่
+        const totalAmount = computed(() => {
+          return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+        })
+
         const addPerson = () => {
           donors.value.push({ name: '', amount: null })
         }
 
-        // ฟังก์ชันลบรายชื่อตามดัชนี (Index)
         const removePerson = (index) => {
-          if (donors.value.length > 1) {
-            donors.value.splice(index, 1)
-          }
+          if (donors.value.length > 1) donors.value.splice(index, 1)
         }
 
-        // ฟังก์ชันเมื่อกดปุ่มยืนยัน (Submit)
+        // ฟังก์ชันจัดการแป้นพิมพ์บัง
+        const handleFocus = (event) => {
+          setTimeout(() => {
+            event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }, 300) // หน่วงเวลาให้แป้นพิมพ์มือถือเด้งขึ้นมาก่อน
+        }
+
         const submitForm = () => {
-          // ในงานจริง ตรงนี้จะใช้ liff.sendMessages() เพื่อส่งข้อมูลกลับแชท
           submittedData.value = donors.value
-          console.log('ข้อมูลที่ต้องการส่งกลับ LINE:', donors.value)
-          // alert(`ยืนยันการทำบุญรวม ${donors.value.length} คน เรียบร้อยแล้ว!`)
+          alert(`สาธุ! ยืนยันยอด ${totalAmount.value} บาท เรียบร้อยแล้ว`)
         }
 
-        return {
-          donors,
-          totalAmount,
-          submittedData,
-          addPerson,
-          removePerson,
-          submitForm
-        }
+        return { isLoaded, donors, totalAmount, submittedData, addPerson, removePerson, submitForm, handleFocus }
       }
     }).mount('#app')
   </script>
