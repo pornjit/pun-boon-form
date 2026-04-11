@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title></title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -30,7 +31,23 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   
   <style>
-    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+      * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+      /* เส้นขีดสีส้มตอนกำลังกรอก */
+    .material-input:focus { border-bottom-color: #ff9800 !important; }
+    .material-input:focus + .material-label { color: #ff9800 !important; }
+
+    /* ปุ่มกากบาทสีแดง ดีไซน์ใหม่ */
+      .btn-delete {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background-color: #ef4444; /* สีแดง */
+      color: white;
+      border-radius: 9999px;
+      padding: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
     
     /* Material Input Style */
     .material-input {
@@ -101,8 +118,9 @@
                class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative overflow-hidden">
             
             <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
-              class="absolute top-1/2 -translate-y-1/2 right-1 text-gray-300 hover:text-red-400 p-2 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              title="กดเพื่อลบรายการนี้"
+              class="btn-delete active:scale-90 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
@@ -167,10 +185,20 @@
         const isLoaded = ref(false)
         const donors = ref([{ name: '', amount: null }])
 
-        onMounted(() => {
-          // หน่วงเวลาเล็กน้อยเพื่อให้ Loader ทำงานสวยๆ
-          setTimeout(() => { isLoaded.value = true }, 800)
-        })
+        // 1. แก้ไข onMounted (ทับบรรทัดประมาณ 146)
+          onMounted(async () => {
+            try {
+              await liff.init({ liffId: "YOUR_LIFF_ID_HERE" }) // ใส่ LIFF ID ของคุณที่นี่
+              if (!liff.isLoggedIn()) {
+                liff.login()
+              } else {
+                isLoaded.value = true
+              }
+            } catch (err) {
+              console.error("LIFF Init Error", err)
+              isLoaded.value = true 
+            }
+          })
 
         const totalAmount = computed(() => {
           return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
@@ -191,11 +219,24 @@
           }, 400)
         }
 
-        const submitForm = () => {
-          // ตรงนี้คุณ Kittipong สามารถใส่ liff.sendMessages() ได้เลยครับ
-          console.log('ข้อมูลที่ส่ง:', donors.value)
-          alert(`สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท เรียบร้อยครับ`)
+        // 2. แก้ไข submitForm 
+      const submitForm = async () => {
+        if (liff.isInClient()) {
+          try {
+            // ส่งข้อความเข้าแชท (ถ้าต้องการ)
+            await liff.sendMessages([{
+              type: 'text',
+              text: `🙏 ยืนยันยอดรวม ${totalAmount.value.toLocaleString()} บาท`
+            }])
+            // สั่งปิดหน้าต่าง LIFF ทันที
+            liff.closeWindow()
+          } catch (err) {
+            liff.closeWindow()
+          }
+        } else {
+          alert(`ยืนยันยอดรวม ${totalAmount.value} บาท เรียบร้อย!`)
         }
+      }
 
         return { isLoaded, donors, totalAmount, addPerson, removePerson, submitForm, handleFocus }
       }
