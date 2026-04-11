@@ -239,77 +239,68 @@
         }
 
         const submitForm = async () => {
-          try {
-            // 1. เตรียมข้อมูลรายชื่อสำหรับใส่ใน Flex
-            const itemList = donors.value.map(p => ({
+        try {
+          const itemList = donors.value.map(p => ({
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#333333", "flex": 4, "wrap": true },
+              { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#333333", "weight": "bold", "flex": 3 }
+            ]
+          }));
+
+          const flexSummary = {
+            "type": "bubble",
+            "header": {
               "type": "box",
-              "layout": "horizontal",
+              "layout": "vertical",
               "contents": [
-                { "type": "text", "text": p.name, "size": "sm", "color": "#555555", "flex": 4 },
-                { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#111111", "weight": "bold", "flex": 2 }
-              ]
-            }));
-        
-            // 2. โครงสร้าง Flex Message สรุปยอด
-            const flexSummary = {
-              "type": "bubble",
-              "header": {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  { "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg", "color": "#6200ea" }
-                ]
-              },
-              "body": {
-                "type": "box",
-                "layout": "vertical",
-                "spacing": "md",
-                "contents": [
-                  // รายชื่อผู้ทำบุญ
-                  { "type": "box", "layout": "vertical", "spacing": "sm", "contents": itemList },
-                  { "type": "separator", "margin": "lg" },
-                  // ยอดรวม
-                  {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "contents": [
-                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md" },
-                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
-                    ]
-                  },
-                  // ป้ายสถานะสีแดงอ่อนๆ
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      { "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }
-                    ],
-                    "backgroundColor": "#fee2e2", // สีแดงอ่อนจางๆ
-                    "cornerRadius": "md",
-                    "paddingAll": "4px",
-                    "margin": "lg"
-                  }
-                ]
-              }
-            };
-        
-            // 3. ส่งเข้าแชท LINE
-            if (liff.isInClient()) {
-              await liff.sendMessages([
+                { "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg", "color": "#4A4A4A" }
+              ],
+              "backgroundColor": "#E9D5FF" // สีม่วงพาสเทล
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "spacing": "md",
+              "contents": [
+                { "type": "box", "layout": "vertical", "spacing": "sm", "contents": itemList },
+                { "type": "separator", "margin": "lg" },
                 {
-                  "type": "flex",
-                  "altText": "สรุปรายการทำบุญของคุณ",
-                  "contents": flexSummary
+                  "type": "box",
+                  "layout": "horizontal",
+                  "margin": "md",
+                  "contents": [
+                    { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#333333" },
+                    { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
+                  ]
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "contents": [
+                    { "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }
+                  ],
+                  "backgroundColor": "#fee2e2",
+                  "cornerRadius": "md",
+                  "paddingAll": "4px",
+                  "margin": "xl"
                 }
-              ]);
-              liff.closeWindow(); // ส่งเสร็จแล้วปิดหน้าจอทันที
-            } else {
-              alert("สรุปยอด: " + totalAmount.value + " บาท (กรุณาเปิดใน LINE เพื่อส่ง Flex)");
+              ]
             }
-          } catch (err) {
-            alert("เกิดข้อผิดพลาด: " + err.message);
+          };
+
+          if (liff.isInClient()) {
+            await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
+            liff.closeWindow();
+          } else {
+            alert("ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
           }
-        };
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      };
+      // 👆 2. วางทับมาถึงแค่ตรงนี้ (ห้ามทับบรรทัด return ด้านล่าง)
 
         return { 
           isLoaded, showSelector, selectedNames, confirmSelection, 
