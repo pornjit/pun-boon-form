@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title></title>
+  <title>บันทึกสายบุญ</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +21,7 @@
             'primary-light': '#d1c4e9',
             'primary-dark': '#3700b3',
             success: '#34A853',
-            magenta: '#ff00ff' // สีบานเย็นที่คุณต้องการ
+            magenta: '#ff00ff'
           }
         }
       }
@@ -31,17 +31,15 @@
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   
   <style>
-      * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-      /* เส้นขีดสีส้มตอนกำลังกรอก */
+    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
     .material-input:focus { border-bottom-color: #ff9800 !important; }
     .material-input:focus + .material-label { color: #ff9800 !important; }
 
-    /* ปุ่มกากบาทสีแดง ดีไซน์ใหม่ */
-      .btn-delete {
+    .btn-delete {
       position: absolute;
       top: -8px;
       right: -8px;
-      background-color: #ef4444; /* สีแดง */
+      background-color: #ef4444;
       color: white;
       border-radius: 9999px;
       padding: 4px;
@@ -49,7 +47,6 @@
       z-index: 10;
     }
     
-    /* Material Input Style */
     .material-input {
       border-bottom: 2px solid #e0e0e0;
       padding: 18px 0 4px 0;
@@ -59,7 +56,6 @@
       background: transparent;
       border-radius: 0;
     }
-    .material-input:focus { border-bottom-color: #6200ea; }
     
     .material-label {
       position: absolute;
@@ -77,7 +73,6 @@
       font-weight: 500;
     }
 
-    /* Loader */
     .loader-container {
       display: flex; flex-direction: column; justify-content: center; align-items: center;
       height: 100vh; background-color: #f8f9fa;
@@ -88,10 +83,6 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    /* ปรับแต่ง Scrollbar */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased">
@@ -100,41 +91,42 @@
     
     <div v-if="!isLoaded" class="loader-container">
       <div class="spinner"></div>
-      <div class="mt-4 text-gray-500 text-sm">กำลังเปิด...</div>
+      <div class="mt-4 text-gray-500 text-sm">กำลังเชื่อมต่อ LINE...</div>
     </div>
 
     <div v-show="isLoaded">
 
-    <div v-if="showSelector" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-  <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl scale-in-center">
-    <div class="text-center mb-6">
-      <div class="bg-primary-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-        <span class="text-2xl">📋</span>
-      </div>
-      <h3 class="text-xl font-bold text-primary">เลือกรายชื่อเก่า</h3>
-      <p class="text-xs text-gray-400">ติ๊กรายชื่อที่ต้องการทำบุญในปีนี้</p>
-    </div>
-    
-    <div class="space-y-3 mb-8">
-      <label class="flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all" 
-             :class="selectedNames.includes('พรจิตต์ กนกยุราพันธ์') ? 'border-orange-500 bg-orange-50' : 'border-gray-100'">
-        <input type="checkbox" value="พรจิตต์ กนกยุราพันธ์" v-model="selectedNames" class="w-5 h-5 accent-orange-500">
-        <span class="ml-3 font-medium text-gray-700">พรจิตต์ กนกยุราพันธ์</span>
-      </label>
-      
-      <label class="flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all" 
-             :class="selectedNames.includes('พรประภา กนกยุราพันธ์') ? 'border-orange-500 bg-orange-50' : 'border-gray-100'">
-        <input type="checkbox" value="พรประภา กนกยุราพันธ์" v-model="selectedNames" class="w-5 h-5 accent-orange-500">
-        <span class="ml-3 font-medium text-gray-700">พรประภา กนกยุราพันธ์</span>
-      </label>
-    </div>
+      <div v-if="showSelector" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl overflow-hidden">
+          <div class="text-center mb-6">
+            <div class="bg-primary-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span class="text-2xl">📋</span>
+            </div>
+            <h3 class="text-xl font-bold text-primary">เลือกรายชื่อเก่า</h3>
+            <p class="text-xs text-gray-400">ติ๊กรายชื่อที่เคยทำบุญปีที่แล้ว</p>
+          </div>
+          
+          <div class="space-y-3 mb-8">
+            <label class="flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all" 
+                   :class="selectedNames.includes('พรจิตต์ กนกยุราพันธ์') ? 'border-orange-500 bg-orange-50' : 'border-gray-100'">
+              <input type="checkbox" value="พรจิตต์ กนกยุราพันธ์" v-model="selectedNames" class="w-5 h-5 accent-orange-500">
+              <span class="ml-3 font-medium text-gray-700">พรจิตต์ กนกยุราพันธ์</span>
+            </label>
+            
+            <label class="flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all" 
+                   :class="selectedNames.includes('พรประภา กนกยุราพันธ์') ? 'border-orange-500 bg-orange-50' : 'border-gray-100'">
+              <input type="checkbox" value="พรประภา กนกยุราพันธ์" v-model="selectedNames" class="w-5 h-5 accent-orange-500">
+              <span class="ml-3 font-medium text-gray-700">พรประภา กนกยุราพันธ์</span>
+            </label>
+          </div>
 
-    <button @click="confirmSelection" 
-            class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all">
-      เปิดฟอร์มบันทึกบุญ
-    </button>
-  </div>
-</div>
+          <button @click="confirmSelection" 
+                  class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all">
+            เปิดฟอร์มบันทึกบุญ
+          </button>
+        </div>
+      </div>
+
       <header class="bg-primary text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อสายบุญ</h1>
@@ -144,12 +136,10 @@
 
       <main class="p-3 max-w-4xl mx-auto pb-48">
         <form @submit.prevent="submitForm" class="space-y-2.5">
-          
           <div v-for="(person, index) in donors" :key="index" 
-               class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative overflow-hidden">
+               class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative">
             
             <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
-              title="กดเพื่อลบรายการนี้"
               class="btn-delete active:scale-90 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -157,51 +147,39 @@
             </button>
 
             <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
-              
               <div class="flex justify-start pb-1">
                 <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">
                   {{ index + 1 }}
                 </span>
               </div>
-
               <div class="relative">
-                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required
-                  @focus="handleFocus"
-                  class="material-input">
+                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required class="material-input" @focus="handleFocus">
                 <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
               </div>
-
               <div class="relative">
-                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required
-                  @focus="handleFocus"
-                  class="material-input font-bold text-right pr-0">
+                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required class="material-input font-bold text-right pr-0" @focus="handleFocus">
                 <label :for="'a-'+index" class="material-label w-full text-right font-normal">บาท</label>
               </div>
             </div>
           </div>
 
           <button @click="addPerson" type="button"
-            class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2 hover:bg-magenta/5">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-            </svg>
+            class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
             เพิ่มรายชื่อคนต่อไป
           </button>
-
         </form>
       </main>
 
       <div class="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t p-4 pb-10 z-40">
         <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <div>
-            <p class="text-[1ุ6px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
             <p class="text-2xl font-black text-magenta leading-tight">
               {{ totalAmount.toLocaleString() }} 
               <span class="text-xs font-normal text-gray-500">บาท</span>
             </p>
           </div>
-          <button @click="submitForm"
-            class="bg-success text-white px-12 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
+          <button @click="submitForm" class="bg-success text-white px-12 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
             ยืนยันบุญ
           </button>
         </div>
@@ -213,58 +191,71 @@
     const { createApp, ref, computed, onMounted } = Vue
     createApp({
       setup() {
-        // --- 👉 ก๊อปปี้ส่วนนี้ไปทับได้เลยครับ ---
-      const isLoaded = ref(false)
-      const showSelector = ref(true) // เพิ่มตัวนี้เข้าไป
-      const selectedNames = ref([])  // เพิ่มตัวนี้เข้าไป
-      const donors = ref([{ name: '', amount: null }])
+        const isLoaded = ref(false)
+        const showSelector = ref(true)
+        const selectedNames = ref([])
+        const donors = ref([{ name: '', amount: null }])
 
-      // ฟังก์ชันใหม่สำหรับ Dialog เลือกรายชื่อ
-      const confirmSelection = () => {
-        if (selectedNames.value.length > 0) {
-          alert("ระบบได้รับรายชื่อ:\n- " + selectedNames.value.join("\n- "));
-          donors.value = selectedNames.value.map(name => ({
-            name: name,
-            amount: null
-          }));
+        const confirmSelection = () => {
+          if (selectedNames.value.length > 0) {
+            alert("ระบบได้รับรายชื่อ:\n- " + selectedNames.value.join("\n- "));
+            donors.value = selectedNames.value.map(name => ({ name, amount: null }));
+          }
+          showSelector.value = false;
         }
-        showSelector.value = false; // ปิด Dialog
-      }
 
-      onMounted(async () => {
-        // รอโหลดสวยๆ 0.8 วินาที
-        setTimeout(() => { isLoaded.value = true }, 800)
-        
-        // ถ้าจะใช้ LIFF อย่าลืมใส่ liff.init ตรงนี้ด้วยนะครับ
-        // await liff.init({ liffId: "YOUR_LIFF_ID" })
-      })
+        onMounted(async () => {
+          try {
+            // สำคัญ: ใส่ LIFF ID ให้ตรงกับหน้า Console
+            await liff.init({ liffId: "2006880053-EAnG4Xay" });
+            if (!liff.isLoggedIn()) {
+              liff.login();
+            } else {
+              isLoaded.value = true;
+            }
+          } catch (err) {
+            console.error("LIFF Init Error:", err);
+            // ถ้าเปิดใน Browser ธรรมดาให้ข้ามไปเลย
+            isLoaded.value = true; 
+          }
+        })
 
-      const totalAmount = computed(() => {
-        return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
-      })
+        const totalAmount = computed(() => {
+          return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+        })
 
-      const addPerson = () => {
-        donors.value.push({ name: '', amount: null })
-      }
+        const addPerson = () => {
+          donors.value.push({ name: '', amount: null })
+        }
 
-      const removePerson = (index) => {
-        if (donors.value.length > 1) donors.value.splice(index, 1)
-      }
+        const removePerson = (index) => {
+          if (donors.value.length > 1) donors.value.splice(index, 1)
+        }
 
-      const handleFocus = (event) => {
-        setTimeout(() => {
-          event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        }, 400)
-      }
+        const handleFocus = (event) => {
+          setTimeout(() => {
+            event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+          }, 400)
+        }
 
-      const submitForm = () => {
-        console.log('ข้อมูลที่ส่ง:', donors.value)
-        alert(`สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท เรียบร้อยครับ`)
-        // liff.closeWindow() // ถ้าใช้ใน LINE อย่าลืมเปิดบรรทัดนี้
-      }
-      // --- 👈 จบส่วนที่ทับ ---
+        const submitForm = async () => {
+          try {
+            const resultMsg = `สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท เรียบร้อยครับ`;
+            if (liff.isInClient()) {
+              await liff.sendMessages([{ type: 'text', text: resultMsg }]);
+              liff.closeWindow();
+            } else {
+              alert(resultMsg);
+            }
+          } catch (err) {
+            alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+          }
+        }
 
-        return { isLoaded,showSelector, selectedNames, confirmSelection, donors, totalAmount, addPerson, removePerson, submitForm, handleFocus }
+        return { 
+          isLoaded, showSelector, selectedNames, confirmSelection, 
+          donors, totalAmount, addPerson, removePerson, submitForm, handleFocus 
+        }
       }
     }).mount('#app')
   </script>
