@@ -187,18 +187,34 @@
 
         // 1. แก้ไข onMounted (ทับบรรทัดประมาณ 146)
           onMounted(async () => {
-            try {
-              await liff.init({ liffId: "YOUR_LIFF_ID_HERE" }) // ใส่ LIFF ID ของคุณที่นี่
-              if (!liff.isLoggedIn()) {
-                liff.login()
-              } else {
-                isLoaded.value = true
+          try {
+            await liff.init({ liffId: "2006880053-EAnG4Xay" });
+            if (liff.isLoggedIn()) {
+              isLoaded.value = true;
+        
+              // --- ส่วนที่เพิ่มใหม่: ดึงชื่อจาก URL ---
+              const urlParams = new URLSearchParams(window.location.search);
+              const namesParam = urlParams.get('names'); // รับค่าจาก ?names=...
+        
+              if (namesParam) {
+                const nameList = namesParam.split(','); // แยกชื่อด้วยเครื่องหมายคอมม่า
+                // ล้างค่าเริ่มต้นเดิม
+                donors.value = []; 
+                // วนลูปสร้างช่อง Input ตามจำนวนชื่อที่ส่งมา
+                nameList.forEach(name => {
+                  donors.value.push({ name: name.trim(), amount: null });
+                });
               }
-            } catch (err) {
-              console.error("LIFF Init Error", err)
-              isLoaded.value = true 
+              // ------------------------------------
+        
+            } else {
+              liff.login();
             }
-          })
+          } catch (err) {
+            console.error("LIFF Init Error", err);
+            isLoaded.value = true;
+          }
+        });
 
         const totalAmount = computed(() => {
           return donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
