@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title></title>
-  
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <title>ระบบบันทึกสายบุญ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,9 +18,9 @@
           colors: {
             primary: '#6200ea',
             'primary-light': '#d1c4e9',
+            'primary-dark': '#3700b3',
             success: '#34A853',
-            magenta: '#ff00ff',
-            accent: '#ff9800' // สีส้มสำหรับการ Focus
+            magenta: '#ff00ff' // สีบานเย็นที่คุณต้องการ
           }
         }
       }
@@ -44,8 +42,7 @@
       background: transparent;
       border-radius: 0;
     }
-    /* ลูกเล่น: กำลังกรอกเป็นสีส้ม */
-    .material-input:focus { border-bottom-color: #ff9800; }
+    .material-input:focus { border-bottom-color: #6200ea; }
     
     .material-label {
       position: absolute;
@@ -55,12 +52,12 @@
       color: #757575;
       pointer-events: none;
     }
-    /* ปรับสี Label ตามสถานะ Focus (สีส้ม) หรือกรอกแล้ว (สีม่วง) */
-    .material-input:focus + .material-label {
-      top: 0; font-size: 11px; color: #ff9800; font-weight: 500;
-    }
+    .material-input:focus + .material-label,
     .material-input:not(:placeholder-shown) + .material-label {
-      top: 0; font-size: 11px; color: #6200ea; font-weight: 500;
+      top: 0;
+      font-size: 11px;
+      color: #6200ea;
+      font-weight: 500;
     }
 
     /* Loader */
@@ -74,6 +71,10 @@
       animation: spin 1s linear infinite;
     }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* ปรับแต่ง Scrollbar */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900 font-sans antialiased">
@@ -88,26 +89,26 @@
     <div v-show="isLoaded">
       <header class="bg-primary text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
-          <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">LIFF MODE</div>
+          <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อสายบุญ</h1>
+          <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">Verified</div>
         </div>
       </header>
 
       <main class="p-3 max-w-4xl mx-auto pb-48">
-        <form @submit.prevent="submitForm" class="space-y-4">
+        <form @submit.prevent="submitForm" class="space-y-2.5">
           
           <div v-for="(person, index) in donors" :key="index" 
-               class="bg-white rounded-2xl p-4 pt-6 shadow-sm border border-gray-100 relative">
+               class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative overflow-hidden">
             
             <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
-              title="กดเพื่อลบรายการนี้"
-              class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-md active:scale-90 transition-all z-10">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+              class="absolute top-1/2 -translate-y-1/2 right-1 text-gray-300 hover:text-red-400 p-2 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
 
             <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
+              
               <div class="flex justify-start pb-1">
                 <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">
                   {{ index + 1 }}
@@ -131,7 +132,7 @@
           </div>
 
           <button @click="addPerson" type="button"
-            class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
+            class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2 hover:bg-magenta/5">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
@@ -152,7 +153,7 @@
           </div>
           <button @click="submitForm"
             class="bg-success text-white px-12 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
-            กดบันทึก
+            ยืนยันบุญ
           </button>
         </div>
       </div>
@@ -166,19 +167,9 @@
         const isLoaded = ref(false)
         const donors = ref([{ name: '', amount: null }])
 
-        onMounted(async () => {
-          try {
-            // กรุณาเปลี่ยน YOUR_LIFF_ID เป็น ID จริงของคุณ
-            await liff.init({ liffId: "2006880053-EAnG4Xay" }) 
-            if (!liff.isLoggedIn()) {
-              liff.login()
-            } else {
-              isLoaded.value = true
-            }
-          } catch (err) {
-            console.error("LIFF Init Error", err)
-            isLoaded.value = true 
-          }
+        onMounted(() => {
+          // หน่วงเวลาเล็กน้อยเพื่อให้ Loader ทำงานสวยๆ
+          setTimeout(() => { isLoaded.value = true }, 800)
         })
 
         const totalAmount = computed(() => {
@@ -193,31 +184,17 @@
           if (donors.value.length > 1) donors.value.splice(index, 1)
         }
 
+        // ป้องกันแป้นพิมพ์บัง
         const handleFocus = (event) => {
           setTimeout(() => {
             event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
           }, 400)
         }
 
-        const submitForm = async () => {
-          // ส่งข้อความเข้าแชท
-          if (liff.isInClient()) {
-            try {
-              await liff.sendMessages([
-                {
-                  type: 'text',
-                  text: `🙏 บันทึกสายบุญเรียบร้อย!\nยอดรวม: ${totalAmount.value.toLocaleString()} บาท\nจำนวน: ${donors.value.length} ท่าน`
-                }
-              ])
-              // ปิดหน้าต่าง LIFF
-              liff.closeWindow()
-            } catch (err) {
-              console.error("Send Message Error", err)
-              liff.closeWindow()
-            }
-          } else {
-            alert(`สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท (ระบบปิดหน้าต่างทำงานใน LINE เท่านั้น)`)
-          }
+        const submitForm = () => {
+          // ตรงนี้คุณ Kittipong สามารถใส่ liff.sendMessages() ได้เลยครับ
+          console.log('ข้อมูลที่ส่ง:', donors.value)
+          alert(`สาธุ! ยืนยันยอดรวม ${totalAmount.value} บาท เรียบร้อยครับ`)
         }
 
         return { isLoaded, donors, totalAmount, addPerson, removePerson, submitForm, handleFocus }
