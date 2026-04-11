@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title></title>
+  <title>ระบบสะพานบุญ</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600&display=swap" rel="stylesheet">
   
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Roboto', 'sans-serif'] },
+          fontFamily: { sans: ['Mitr', 'sans-serif'] }, // ตั้ง Mitr เป็นฟอนต์หลัก
           colors: {
             primary: '#6200ea',
             'primary-dark': '#3700b3',
-            secondary: '#03dac6',
             success: '#34A853'
           }
         }
@@ -52,7 +51,7 @@
       top: 0;
       font-size: 11px;
       color: #6200ea;
-      font-weight: 600;
+      font-weight: 500;
     }
     .loader-container {
       display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -71,36 +70,36 @@
   <div id="app" class="min-h-screen">
     <div v-if="!isLoaded" class="loader-container">
       <div class="spinner"></div>
-      <div class="loading-text mt-4 text-gray-500">กำลังเข้าสู่หน้างานบุญ...</div>
+      <div class="loading-text mt-4 text-gray-500">กำลังเปิดหน้างานบุญ...</div>
     </div>
 
     <div v-show="isLoaded">
       <header class="bg-primary text-white shadow-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div class="flex items-center">
-            <h1 class="text-xl font-bold">🙏 บันทึกสายบุญ</h1>
-          </div>
-          <div class="text-xs bg-primary-dark px-3 py-1 rounded-full text-primary-light">V.2026</div>
+          <h1 class="text-xl font-medium tracking-wide">🙏 บันทึกรายชื่อออกใบอนุโมทนาบัตร</h1>
+          <div class="text-[10px] bg-primary-dark/50 px-3 py-1 rounded-full text-white">PRO EDITION</div>
         </div>
       </header>
 
-      <main class="p-3 md:p-8 max-w-4xl mx-auto pb-40">
+      <main class="p-3 max-w-4xl mx-auto pb-40">
         <form @submit.prevent="submitForm" class="space-y-3">
           
           <div v-for="(person, index) in donors" :key="index" 
-               class="bg-white rounded-xl p-3 pr-10 shadow-sm border border-gray-100 relative group">
+               class="bg-white rounded-2xl p-4 pr-10 shadow-sm border border-gray-100 relative overflow-hidden">
             
             <button v-if="donors.length > 1" @click="removePerson(index)" type="button"
-              class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-300 hover:text-red-400">
+              class="absolute top-1/2 -translate-y-1/2 right-2 text-gray-300 hover:text-red-400 p-2">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
               </svg>
             </button>
 
-            <div class="grid grid-cols-[35px_1fr_90px] gap-3 items-end">
+            <div class="grid grid-cols-[40px_1fr_90px] gap-3 items-end">
               
-              <div class="pb-1 text-center">
-                <span class="text-primary font-bold text-lg">{{ index + 1 }}.</span>
+              <div class="flex justify-center pb-1">
+                <span class="bg-primary text-white w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm shadow-md shadow-primary/20">
+                  {{ index + 1 }}
+                </span>
               </div>
 
               <div class="relative">
@@ -120,28 +119,26 @@
             </div>
           </div>
 
-          <div class="py-2">
-            <button @click="addPerson" type="button"
-              class="w-full py-3 border-2 border-dashed border-primary/30 rounded-xl text-primary font-medium flex items-center justify-center hover:bg-primary/5 active:bg-primary/10 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-              </svg>
-              เพิ่มรายชื่อ
-            </button>
-          </div>
+          <button @click="addPerson" type="button"
+            class="w-full py-3 bg-white border-2 border-dashed border-primary/20 rounded-2xl text-primary font-medium flex items-center justify-center active:scale-95 transition mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            เพิ่มรายชื่อคนต่อไป
+          </button>
 
         </form>
       </main>
 
-      <div class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 shadow-[0_-5px_15px_rgba(0,0,0,0.05)] z-40">
+      <div class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-md border-t p-4 pb-8 z-40">
         <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
           <div>
-            <p class="text-[10px] text-gray-500 uppercase font-bold tracking-wider">รวมทั้งสิ้น</p>
-            <p class="text-xl font-black text-primary">{{ totalAmount.toLocaleString() }} <span class="text-sm font-normal">บาท</span></p>
+            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-widest">ยอดรวมสุทธิ</p>
+            <p class="text-2xl font-black text-primary">{{ totalAmount.toLocaleString() }} <span class="text-xs font-normal">บาท</span></p>
           </div>
           <button @click="submitForm"
-            class="bg-success text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-success/30 active:scale-95 transition-all">
-            ยืนยันยอดบุญ
+            class="bg-success text-white px-10 py-3 rounded-2xl font-bold shadow-lg shadow-success/30 active:scale-95 transition-all">
+            ยืนยันบุญ
           </button>
         </div>
       </div>
@@ -154,7 +151,6 @@
       setup() {
         const isLoaded = ref(false)
         const donors = ref([{ name: '', amount: null }])
-        const submittedData = ref(null)
 
         onMounted(() => {
           setTimeout(() => { isLoaded.value = true }, 800)
@@ -172,19 +168,17 @@
           if (donors.value.length > 1) donors.value.splice(index, 1)
         }
 
-        // ฟังก์ชันจัดการแป้นพิมพ์บัง
         const handleFocus = (event) => {
           setTimeout(() => {
             event.target.scrollIntoView({ behavior: 'smooth', block: 'center' })
-          }, 300) // หน่วงเวลาให้แป้นพิมพ์มือถือเด้งขึ้นมาก่อน
+          }, 400)
         }
 
         const submitForm = () => {
-          submittedData.value = donors.value
           alert(`สาธุ! ยืนยันยอด ${totalAmount.value} บาท เรียบร้อยแล้ว`)
         }
 
-        return { isLoaded, donors, totalAmount, submittedData, addPerson, removePerson, submitForm, handleFocus }
+        return { isLoaded, donors, totalAmount, addPerson, removePerson, submitForm, handleFocus }
       }
     }).mount('#app')
   </script>
