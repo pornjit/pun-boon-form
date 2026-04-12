@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ระบบบันทึกสายบุญ</title>
+  <title></title>
   
   <style>
     #first-loader {
@@ -18,27 +18,23 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .fade-out { opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
     
-    /* Font & Base Style */
-    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; }
-    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; margin: 0; }
+    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box; }
+    
     .material-input {
       border-bottom: 2px solid #e0e0e0; padding: 18px 0 4px 0;
-      width: 100%; font-size: 16px; outline: none;
-      background: transparent; border-radius: 0;
+      width: 100%; font-size: 16px; outline: none; background: transparent; border-radius: 0; border-top: none; border-left: none; border-right: none;
     }
     .material-label {
-      position: absolute; top: 18px; left: 0;
-      font-size: 15px; color: #757575; pointer-events: none;
+      position: absolute; top: 18px; left: 0; font-size: 15px; color: #757575; pointer-events: none;
     }
     .material-input:focus + .material-label,
     .material-input:not(:placeholder-shown) + .material-label {
       top: 0; font-size: 11px; color: #6200ea; font-weight: 500;
     }
     .btn-delete {
-      position: absolute; top: -8px; right: -8px;
-      background-color: #ef4444; color: white;
-      border-radius: 9999px; padding: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
+      position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white;
+      border-radius: 9999px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
     }
   </style>
 
@@ -61,10 +57,10 @@
 
   <div id="first-loader">
     <div class="spinner"></div>
-    <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเตรียมข้อมูลบุญ...</div>
+    <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเข้าสู่ระบบบุญ...</div>
   </div>
 
-  <div id="app" style="display: none;" class="min-h-screen">
+  <div id="app" class="min-h-screen">
     
     <div v-if="showSelector" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
       <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl">
@@ -163,7 +159,15 @@
         }
 
         onMounted(async () => {
+          // 🚀 ขั้นตอนที่ 1: สั่งโวพ UI ทันที และซ่อน Loader ทันทีที่ JS พื้นฐานพร้อม
+          const loader = document.getElementById('first-loader');
+          if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+          }
+
           try {
+            // 🚀 ขั้นตอนที่ 2: แอบรัน LIFF Init อยู่เบื้องหลัง (จุดที่เคยนิ่งนาน)
             await liff.init({ liffId: "2009694352-LHMu0lor" });
             
             const urlParams = new URLSearchParams(window.location.search);
@@ -173,18 +177,9 @@
               liff.login();
             } else {
               isLoaded.value = true;
-              // ปิด Loader อย่างนุ่มนวล
-              const loader = document.getElementById('first-loader');
-              loader.classList.add('fade-out');
-              setTimeout(() => { 
-                loader.style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-              }, 500);
             }
           } catch (err) {
-            console.error("LIFF Error:", err);
-            document.getElementById('first-loader').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
+            console.error("LIFF Background Error:", err);
           }
         });
 
@@ -196,6 +191,11 @@
         }
 
         const submitForm = async () => {
+          if (!liff.isInClient()) {
+            alert("บันทึกเรียบร้อย ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
+            return;
+          }
+
           try {
             const itemList = donors.value.map(p => ({
               "type": "box", "layout": "horizontal",
@@ -241,12 +241,8 @@
               }
             };
 
-            if (liff.isInClient()) {
-              await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
-              liff.closeWindow();
-            } else {
-              alert("บันทึกเรียบร้อย ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
-            }
+            await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
+            liff.closeWindow();
           } catch (err) {
             alert("Error: " + err.message);
           }
