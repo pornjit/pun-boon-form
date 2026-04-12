@@ -198,13 +198,13 @@
           setTimeout(() => { event.target.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 400)
         }
 
-        const submitForm = async () => {
+       const submitForm = async () => {
           try {
             const itemList = donors.value.map(p => ({
               "type": "box", "layout": "horizontal",
               "contents": [
-                { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#333333", "flex": 4, "wrap": true },
-                { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#333333", "weight": "bold", "flex": 3 }
+                { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#666699", "flex": 4, "wrap": true },
+                { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#666699", "weight": "bold", "flex": 3 }
               ]
             }));
 
@@ -212,9 +212,14 @@
               "type": "bubble",
               "header": {
                 "type": "box", "layout": "vertical",
-                "contents": [{ "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg",
-                              "color": "#ffffff" }],
-                "backgroundColor": "#cc33ff."
+                "contents": [{ 
+                  "type": "text", 
+                  "text": "📋 สรุปรายการทำบุญ", 
+                  "weight": "bold", 
+                  "size": "lg",
+                  "color": "#ffffff" // Header Font เป็นสีขาว
+                }],
+                "backgroundColor": "#cc33ff" // Header Background (ลบจุดออกแล้ว)
               },
               "body": {
                 "type": "box", "layout": "vertical", "spacing": "md",
@@ -224,15 +229,14 @@
                   {
                     "type": "box", "layout": "horizontal", "margin": "md",
                     "contents": [
-                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#0066CC" },
-                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": 
-                        "bold", "size": "md", "align": "end", "color": "#ff00ff" }
+                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#cc3399" },
+                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
                     ]
                   },
                   {
                     "type": "box", "layout": "vertical",
-                    "contents": [{ "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }],
-                    "backgroundColor": "#cc3399", "cornerRadius": "md", "paddingAll": "4px", "margin": "xl"
+                    "contents": [{ "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ffffff", "align": "center", "weight": "bold" }],
+                    "backgroundColor": "#ef4444", "cornerRadius": "md", "paddingAll": "4px", "margin": "xl"
                   }
                 ]
               },
@@ -240,7 +244,7 @@
                 "type": "box", "layout": "vertical",
                 "contents": [{
                   "type": "button",
-                  "action": { "type": "uri", "label": "", "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit" },
+                  "action": { "type": "uri", "label": "แก้ไขรายการ", "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit" },
                   "style": "link", "color": "#6200ea"
                 }]
               }
