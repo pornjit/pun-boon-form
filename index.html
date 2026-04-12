@@ -212,8 +212,9 @@
               "type": "bubble",
               "header": {
                 "type": "box", "layout": "vertical",
-                "contents": [{ "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg", "color": "#4A4A4A" }],
-                "backgroundColor": "#E9D5FF"
+                "contents": [{ "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg",
+                              "color": "#ffffff" }],
+                "backgroundColor": "#cc33ff."
               },
               "body": {
                 "type": "box", "layout": "vertical", "spacing": "md",
@@ -223,14 +224,15 @@
                   {
                     "type": "box", "layout": "horizontal", "margin": "md",
                     "contents": [
-                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#333333" },
-                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
+                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#0066CC" },
+                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": 
+                        "bold", "size": "md", "align": "end", "color": "#ff00ff" }
                     ]
                   },
                   {
                     "type": "box", "layout": "vertical",
                     "contents": [{ "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }],
-                    "backgroundColor": "#fee2e2", "cornerRadius": "md", "paddingAll": "4px", "margin": "xl"
+                    "backgroundColor": "#cc3399", "cornerRadius": "md", "paddingAll": "4px", "margin": "xl"
                   }
                 ]
               },
@@ -238,7 +240,7 @@
                 "type": "box", "layout": "vertical",
                 "contents": [{
                   "type": "button",
-                  "action": { "type": "uri", "label": "แก้ไขรายการ", "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit" },
+                  "action": { "type": "uri", "label": "", "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit" },
                   "style": "link", "color": "#6200ea"
                 }]
               }
