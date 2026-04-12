@@ -35,6 +35,14 @@
     .material-input:focus { border-bottom-color: #ff9800 !important; }
     .material-input:focus + .material-label { color: #ff9800 !important; }
 
+    @keyframes bounce-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    }
+    .animate-bounce-slow {
+      animation: bounce-slow 3s ease-in-out infinite;
+    }
+
     .btn-delete {
       position: absolute;
       top: -8px;
@@ -269,67 +277,94 @@
         }
 
         const submitForm = async () => {
-        try {
-          const itemList = donors.value.map(p => ({
-            "type": "box",
-            "layout": "horizontal",
-            "contents": [
-              { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#333333", "flex": 4, "wrap": true },
-              { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#333333", "weight": "bold", "flex": 3 }
-            ]
-          }));
-
-          const flexSummary = {
-            "type": "bubble",
-            "header": {
+          try {
+            // 1. เตรียมรายการรายชื่อและยอดเงิน
+            const itemList = donors.value.map(p => ({
               "type": "box",
-              "layout": "vertical",
+              "layout": "horizontal",
               "contents": [
-                { "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg", "color": "#4A4A4A" }
-              ],
-              "backgroundColor": "#E9D5FF" // สีม่วงพาสเทล
-            },
-            "body": {
-              "type": "box",
-              "layout": "vertical",
-              "spacing": "md",
-              "contents": [
-                { "type": "box", "layout": "vertical", "spacing": "sm", "contents": itemList },
-                { "type": "separator", "margin": "lg" },
-                {
-                  "type": "box",
-                  "layout": "horizontal",
-                  "margin": "md",
-                  "contents": [
-                    { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#333333" },
-                    { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
-                  ]
-                },
-                {
-                  "type": "box",
-                  "layout": "vertical",
-                  "contents": [
-                    { "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }
-                  ],
-                  "backgroundColor": "#fee2e2",
-                  "cornerRadius": "md",
-                  "paddingAll": "4px",
-                  "margin": "xl"
-                }
+                { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#333333", "flex": 4, "wrap": true },
+                { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#333333", "weight": "bold", "flex": 3 }
               ]
-            }
-          };
+            }));
 
-          if (liff.isInClient()) {
-            await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
-            liff.closeWindow();
-          } else {
-            alert("ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
+            // 2. โครงสร้าง Flex Message พร้อมน้อง "ยังไม่อนุมัติ"
+            const flexSummary = {
+              "type": "bubble",
+              "hero": {
+                "type": "image",
+                "url": "https://stickershop.line-scdn.net/stickershop/v1/sticker/624108846/android/sticker.png",
+                "size": "xl",
+                "aspectRatio": "1.5:1",
+                "aspectMode": "fit",
+                "backgroundColor": "#E9D5FF"
+              },
+              "header": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  { "type": "text", "text": "📋 สรุปรายการทำบุญ", "weight": "bold", "size": "lg", "color": "#4A4A4A" }
+                ],
+                "backgroundColor": "#E9D5FF"
+              },
+              "body": {
+                "type": "box",
+                "layout": "vertical",
+                "spacing": "md",
+                "contents": [
+                  { "type": "box", "layout": "vertical", "spacing": "sm", "contents": itemList },
+                  { "type": "separator", "margin": "lg" },
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "md",
+                    "contents": [
+                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#333333" },
+                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
+                    ]
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      { "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ef4444", "align": "center", "weight": "bold" }
+                    ],
+                    "backgroundColor": "#fee2e2",
+                    "cornerRadius": "md",
+                    "paddingAll": "4px",
+                    "margin": "xl"
+                  }
+                ]
+              },
+              "footer": {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "button",
+                    "action": {
+                      "type": "uri",
+                      "label": "แก้ไขรายการ",
+                      "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit"
+                    },
+                    "style": "link",
+                    "color": "#6200ea"
+                  }
+                ]
+              }
+            };
+
+            // 3. ส่งข้อความเข้า LINE
+            if (liff.isInClient()) {
+              await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
+              liff.closeWindow();
+            } else {
+              alert("บันทึกสำเร็จ! ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
+            }
+          } catch (err) {
+            alert("Error: " + err.message);
           }
-        } catch (err) {
-          alert("Error: " + err.message);
-        }
-      };
+        };
       // 👆 2. วางทับมาถึงแค่ตรงนี้ (ห้ามทับบรรทัด return ด้านล่าง)
 
         return { 
