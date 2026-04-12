@@ -18,27 +18,24 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .fade-out { opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
     
-    /* Font & Base Style */
-    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; }
-    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; margin: 0; }
+    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box; }
+    
     .material-input {
       border-bottom: 2px solid #e0e0e0; padding: 18px 0 4px 0;
-      width: 100%; font-size: 16px; outline: none;
-      background: transparent; border-radius: 0;
+      width: 100%; font-size: 16px; outline: none; background: transparent; 
+      border-radius: 0; border-top: none; border-left: none; border-right: none;
     }
     .material-label {
-      position: absolute; top: 18px; left: 0;
-      font-size: 15px; color: #757575; pointer-events: none;
+      position: absolute; top: 18px; left: 0; font-size: 15px; color: #757575; pointer-events: none;
     }
     .material-input:focus + .material-label,
     .material-input:not(:placeholder-shown) + .material-label {
       top: 0; font-size: 11px; color: #6200ea; font-weight: 500;
     }
     .btn-delete {
-      position: absolute; top: -8px; right: -8px;
-      background-color: #ef4444; color: white;
-      border-radius: 9999px; padding: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
+      position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white;
+      border-radius: 9999px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
     }
   </style>
 
@@ -64,10 +61,10 @@
     <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเตรียมข้อมูลบุญ...</div>
   </div>
 
-  <div id="app" style="display: none;" class="min-h-screen">
+  <div id="app" class="min-h-screen">
     
-    <div v-if="showSelector" class="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4 backdrop-blur-sm">
-      <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl">
+    <div v-if="showSelector" class="fixed inset-0 bg-[#f9fafb] z-[100] flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-xl border border-gray-100">
         <div class="text-center mb-6">
           <div class="bg-primary-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
             <span class="text-2xl">📋</span>
@@ -91,58 +88,60 @@
       </div>
     </div>
 
-    <header class="bg-primary text-white shadow-md sticky top-0 z-50">
-      <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-        <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
-        <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">Verified</div>
-      </div>
-    </header>
+    <template v-else>
+      <header class="bg-primary text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
+          <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">Verified</div>
+        </div>
+      </header>
 
-    <main class="p-3 max-w-4xl mx-auto pb-48">
-      <form @submit.prevent="submitForm" class="space-y-3">
-        <div v-for="(person, index) in donors" :key="index" 
-             class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative">
-          
-          <button v-if="donors.length > 1" @click="removePerson(index)" type="button" class="btn-delete active:scale-90">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-            </svg>
-          </button>
+      <main class="p-3 max-w-4xl mx-auto pb-48">
+        <form @submit.prevent="submitForm" class="space-y-3">
+          <div v-for="(person, index) in donors" :key="index" 
+               class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative">
+            
+            <button v-if="donors.length > 1" @click="removePerson(index)" type="button" class="btn-delete active:scale-90">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+              </svg>
+            </button>
 
-          <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
-            <div class="flex justify-start pb-1">
-              <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">{{ index + 1 }}</span>
-            </div>
-            <div class="relative">
-              <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required class="material-input" @focus="handleFocus">
-              <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
-            </div>
-            <div class="relative">
-              <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required class="material-input font-bold text-right pr-0" @focus="handleFocus">
-              <label :for="'a-'+index" class="material-label w-full text-right font-normal">บาท</label>
+            <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
+              <div class="flex justify-start pb-1">
+                <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">{{ index + 1 }}</span>
+              </div>
+              <div class="relative">
+                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required class="material-input" @focus="handleFocus">
+                <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
+              </div>
+              <div class="relative">
+                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required class="material-input font-bold text-right pr-0" @focus="handleFocus">
+                <label :for="'a-'+index" class="material-label w-full text-right font-normal">บาท</label>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <button @click="addPerson" type="button" class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
-          + เพิ่มรายชื่อคนต่อไป
-        </button>
-      </form>
-    </main>
+          
+          <button @click="addPerson" type="button" class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
+            + เพิ่มรายชื่อคนต่อไป
+          </button>
+        </form>
+      </main>
 
-    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t p-4 pb-10 z-40">
-      <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-        <div>
-          <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
-          <p class="text-2xl font-black text-magenta leading-tight">
-            {{ totalAmount.toLocaleString() }} <span class="text-xs font-normal text-gray-500">บาท</span>
-          </p>
+      <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t p-4 pb-10 z-40">
+        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
+          <div>
+            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
+            <p class="text-2xl font-black text-magenta leading-tight">
+              {{ totalAmount.toLocaleString() }} <span class="text-xs font-normal text-gray-500">บาท</span>
+            </p>
+          </div>
+          <button @click="submitForm" class="bg-success text-white px-10 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
+            กดบันทึกข้อมูล
+          </button>
         </div>
-        <button @click="submitForm" class="bg-success text-white px-10 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
-          กดบันทึกข้อมูล
-        </button>
       </div>
-    </div>
+    </template>
   </div>
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -163,9 +162,15 @@
         }
 
         onMounted(async () => {
+          // ปิด Loader ทันทีที่ Vue พร้อมทำงาน (แก้หน้าขาว)
+          const loader = document.getElementById('first-loader');
+          if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(() => { loader.style.display = 'none'; }, 500);
+          }
+
           try {
             await liff.init({ liffId: "2009694352-LHMu0lor" });
-            
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('mode') === 'edit') showSelector.value = false;
 
@@ -173,18 +178,9 @@
               liff.login();
             } else {
               isLoaded.value = true;
-              // ปิด Loader อย่างนุ่มนวล
-              const loader = document.getElementById('first-loader');
-              loader.classList.add('fade-out');
-              setTimeout(() => { 
-                loader.style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-              }, 500);
             }
           } catch (err) {
             console.error("LIFF Error:", err);
-            document.getElementById('first-loader').style.display = 'none';
-            document.getElementById('app').style.display = 'block';
           }
         });
 
