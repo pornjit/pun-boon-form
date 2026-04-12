@@ -6,6 +6,7 @@
   <title>ระบบบันทึกสายบุญ</title>
   
   <style>
+    /* 1. Loader: ต้องอยู่บนสุดและบังมิดทุกอย่าง */
     #first-loader {
       position: fixed; inset: 0; z-index: 9999; background: #ffffff;
       display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -18,9 +19,10 @@
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     .fade-out { opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
     
-    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; margin: 0; }
+    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; margin: 0; overflow-x: hidden; }
     * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box; }
     
+    /* 2. Form Style */
     .material-input {
       border-bottom: 2px solid #e0e0e0; padding: 18px 0 4px 0;
       width: 100%; font-size: 16px; outline: none; background: transparent; 
@@ -37,6 +39,9 @@
       position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white;
       border-radius: 9999px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
     }
+    
+    /* 3. ล็อคไม่ให้เลื่อนจอถ้า Dialog เปิดอยู่ */
+    .lock-scroll { overflow: hidden; height: 100vh; }
   </style>
 
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -58,13 +63,14 @@
 
   <div id="first-loader">
     <div class="spinner"></div>
-    <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเตรียมข้อมูลบุญ...</div>
+    <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเข้าสู่ระบบ...</div>
   </div>
 
-  <div id="app" class="min-h-screen">
+  <div id="app" :class="{'lock-scroll': showSelector}">
     
-    <div v-if="showSelector" class="fixed inset-0 bg-[#f9fafb] z-[100] flex items-center justify-center p-4">
-      <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-xl border border-gray-100">
+    <div v-if="showSelector" 
+         class="fixed inset-0 bg-[#f9fafb] z-[100] flex items-center justify-center p-4 overflow-y-auto">
+      <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-gray-100 my-auto">
         <div class="text-center mb-6">
           <div class="bg-primary-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
             <span class="text-2xl">📋</span>
@@ -88,7 +94,7 @@
       </div>
     </div>
 
-    <template v-else>
+    <div v-show="!showSelector">
       <header class="bg-primary text-white shadow-md sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
@@ -141,7 +147,7 @@
           </button>
         </div>
       </div>
-    </template>
+    </div>
   </div>
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -162,7 +168,7 @@
         }
 
         onMounted(async () => {
-          // ปิด Loader ทันทีที่ Vue พร้อมทำงาน (แก้หน้าขาว)
+          // สั่งปิด Loader ทันทีที่ Vue พร้อม (แก้หน้าขาว)
           const loader = document.getElementById('first-loader');
           if (loader) {
             loader.classList.add('fade-out');
@@ -172,6 +178,7 @@
           try {
             await liff.init({ liffId: "2009694352-LHMu0lor" });
             const urlParams = new URLSearchParams(window.location.search);
+            // ถ้าเป็นโหมดแก้ไข ไม่ต้องโชว์ตัวเลือก
             if (urlParams.get('mode') === 'edit') showSelector.value = false;
 
             if (!liff.isLoggedIn()) {
