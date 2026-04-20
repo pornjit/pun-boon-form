@@ -11,7 +11,6 @@
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
 </head>
 <body class="p-3">
 
@@ -37,26 +36,29 @@
   const LIFF_ID = "2009694352-LHMu0lor";
 
   async function main() {
-   
+   alert("1: เริ่ม");
 
     await liff.init({ liffId: LIFF_ID });
-
+ alert("2: init แล้ว");
 
     if (!liff.isLoggedIn()) {
-   
+    <!-  alert("ยังไม่ login");
       liff.login();
       return;
     }
 
     const profile = await liff.getProfile();
-    
+    alert("3: ได้ userId = " + profile.userId);
+
     document.getElementById("donateForm").addEventListener("submit", async (e) => {
       e.preventDefault();
+
+      alert("4: กด submit");
 
       const name = document.getElementById("name").value;
       const amount = document.getElementById("amount").value;
 
-       // loading
+      // loading
       Swal.fire({
         title: 'กำลังบันทึก...',
         allowOutsideClick: false,
@@ -78,35 +80,35 @@
           })
         });
 
-        const data = await res.json();
-        // success
-    await Swal.fire({
-      icon: 'success',
-      title: 'บันทึกเรียบร้อย 🎉',
-      text: 'เลขที่: ' + data.donateId,
-      confirmButtonText: 'กลับไปแชท'
-    });
+        alert("5: ยิง API แล้ว");
 
-    // 👉 ส่ง message กลับ LINE (optional)
-    await liff.sendMessages([
-      {
-        type: "text",
-        text: "บันทึกเรียบร้อย เลขที่: " + data.donateId
-      }
-    ]);
+        const data = await res.json();
+        alert("6: ได้ response " + JSON.stringify(data));
+        // success
+        await Swal.fire({
+          icon: 'success',
+          title: 'บันทึกเรียบร้อย 🎉',
+          text: 'เลขที่: ' + data.donateId,
+          confirmButtonText: 'กลับไปแชท'
+        });
+
+        // 👉 ส่ง message กลับ LINE (optional)
+      await liff.sendMessages([
+        {
+          type: "text",
+          text: "บันทึกเรียบร้อย เลขที่: " + data.donateId
+        }
+      ]);
 
     // 👉 ปิด LIFF กลับแชท
     liff.closeWindow();
 
-    } catch (err) {
-      Swal.fire({
-        icon: 'error',
-        title: 'เกิดข้อผิดพลาด',
-        text: err.message
+      } catch (err) {
+        alert("ERROR: " + err.message);
+      }
     });
   }
-});
-        
+
   main();
 </script>
 
