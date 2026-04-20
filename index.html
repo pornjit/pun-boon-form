@@ -32,25 +32,30 @@
 </div>
 
 <script>
-  const LIFF_ID = "2009694352-LHMu0lor"; // 🔥 ใส่ของจริง
+  const LIFF_ID = "2009694352-LHMu0lor";
 
   async function main() {
+    alert("1: เริ่ม");
+
     await liff.init({ liffId: LIFF_ID });
+    alert("2: init แล้ว");
 
     if (!liff.isLoggedIn()) {
+      alert("ยังไม่ login");
       liff.login();
       return;
     }
 
     const profile = await liff.getProfile();
+    alert("3: ได้ userId = " + profile.userId);
 
     document.getElementById("donateForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
+      alert("4: กด submit");
+
       const name = document.getElementById("name").value;
       const amount = document.getElementById("amount").value;
-
-      alert("กำลังบันทึก...");
 
       try {
         const res = await fetch("https://linebot-donate.onrender.com/save", {
@@ -65,19 +70,10 @@
           })
         });
 
+        alert("5: ยิง API แล้ว");
+
         const data = await res.json();
-
-        alert("บันทึกสำเร็จ ID: " + data.donateId);
-
-        // ส่งกลับไปแชท
-        await liff.sendMessages([
-          {
-            type: "text",
-            text: "บันทึกแล้ว ID: " + data.donateId
-          }
-        ]);
-
-        liff.closeWindow();
+        alert("6: ได้ response " + JSON.stringify(data));
 
       } catch (err) {
         alert("ERROR: " + err.message);
