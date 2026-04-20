@@ -1,269 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title></title>
-  
-  <style>
-    /* 1. Loader: ต้องอยู่บนสุดและบังมิดทุกอย่าง */
-    #first-loader {
-      position: fixed; inset: 0; z-index: 9999; background: #ffffff;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-    }
-    .spinner {
-      width: 45px; height: 45px; border: 4px solid #f3f4f6;
-      border-top: 4px solid #6200ea; border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .fade-out { opacity: 0; transition: opacity 0.5s ease; pointer-events: none; }
-    
-    body { font-family: 'Mitr', sans-serif; background-color: #f9fafb; margin: 0; overflow-x: hidden; }
-    * { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); box-sizing: border-box; }
-    
-    /* 2. Form Style */
-    .material-input {
-      border-bottom: 2px solid #e0e0e0; padding: 18px 0 4px 0;
-      width: 100%; font-size: 16px; outline: none; background: transparent; 
-      border-radius: 0; border-top: none; border-left: none; border-right: none;
-    }
-    .material-label {
-      position: absolute; top: 18px; left: 0; font-size: 15px; color: #757575; pointer-events: none;
-    }
-    .material-input:focus + .material-label,
-    .material-input:not(:placeholder-shown) + .material-label {
-      top: 0; font-size: 11px; color: #6200ea; font-weight: 500;
-    }
-    .btn-delete {
-      position: absolute; top: -8px; right: -8px; background-color: #ef4444; color: white;
-      border-radius: 9999px; padding: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10;
-    }
-    
-    /* 3. ล็อคไม่ให้เลื่อนจอถ้า Dialog เปิดอยู่ */
-    .lock-scroll { overflow: hidden; height: 100vh; }
-  </style>
+  <title>LIFF Get User</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { primary: '#6200ea', 'primary-light': '#d1c4e9', success: '#34A853', magenta: '#ff00ff' }
-        }
-      }
-    }
-  </script>
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 </head>
-<body class="antialiased">
 
-  <div id="first-loader">
-    <div class="spinner"></div>
-    <div style="margin-top: 16px; color: #6B7280; font-size: 14px;">กำลังเข้าสู่ระบบ...</div>
-  </div>
+<body>
+  <h2>กำลังโหลด...</h2>
 
-  <div id="app" :class="{'lock-scroll': showSelector}">
-    
-    <div v-if="showSelector" 
-         class="fixed inset-0 bg-[#f9fafb] z-[100] flex items-center justify-center p-4 overflow-y-auto">
-      <div class="bg-white w-full max-w-sm rounded-[32px] p-8 shadow-2xl border border-gray-100 my-auto">
-        <div class="text-center mb-6">
-          <div class="bg-primary-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3">
-            <span class="text-2xl">📋</span>
-          </div>
-          <h3 class="text-xl font-bold text-primary">เลือกจากรายชื่อปีที่แล้ว</h3>
-          <p class="text-xs text-gray-400">ติ๊กเลือกรายชื่อ</p>
-        </div>
-        
-        <div class="space-y-3 mb-8">
-          <label v-for="oldName in ['พรจิตต์ กนกยุราพันธ์', 'พรประภา กนกยุราพันธ์']" :key="oldName"
-                 class="flex items-center p-4 border-2 rounded-2xl cursor-pointer transition-all" 
-                 :class="selectedNames.includes(oldName) ? 'border-orange-500 bg-orange-50' : 'border-gray-100'">
-            <input type="checkbox" :value="oldName" v-model="selectedNames" class="w-5 h-5 accent-orange-500">
-            <span class="ml-3 font-medium text-gray-700">{{ oldName }}</span>
-          </label>
-        </div>
-
-        <button @click="confirmSelection" class="w-full py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-95 transition-all">
-          เปิดฟอร์มบันทึกบุญ
-        </button>
-      </div>
-    </div>
-
-    <div v-show="!showSelector">
-      <header class="bg-primary text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 class="text-lg font-medium tracking-wide">🙏 บันทึกรายชื่อ</h1>
-          <div class="text-[9px] border border-white/40 px-2 py-0.5 rounded uppercase tracking-tighter">Verified</div>
-        </div>
-      </header>
-
-      <main class="p-3 max-w-4xl mx-auto pb-48">
-        <form @submit.prevent="submitForm" class="space-y-3">
-          <div v-for="(person, index) in donors" :key="index" 
-               class="bg-white rounded-2xl p-3 pr-9 shadow-sm border border-gray-100 relative">
-            
-            <button v-if="donors.length > 1" @click="removePerson(index)" type="button" class="btn-delete active:scale-90">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-              </svg>
-            </button>
-
-            <div class="grid grid-cols-[32px_1fr_75px] gap-3 items-end">
-              <div class="flex justify-start pb-1">
-                <span class="bg-primary-light text-primary w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs">{{ index + 1 }}</span>
-              </div>
-              <div class="relative">
-                <input :id="'n-'+index" v-model="person.name" type="text" placeholder=" " required class="material-input" @focus="handleFocus">
-                <label :for="'n-'+index" class="material-label">ชื่อ-นามสกุล</label>
-              </div>
-              <div class="relative">
-                <input :id="'a-'+index" v-model.number="person.amount" type="number" placeholder=" " required class="material-input font-bold text-right pr-0" @focus="handleFocus">
-                <label :for="'a-'+index" class="material-label w-full text-right font-normal">บาท</label>
-              </div>
-            </div>
-          </div>
-          
-          <button @click="addPerson" type="button" class="w-full py-3 bg-white border-2 border-dashed border-magenta/30 rounded-2xl text-magenta font-medium flex items-center justify-center active:scale-95 transition mt-2">
-            + เพิ่มรายชื่อคนต่อไป
-          </button>
-        </form>
-      </main>
-
-      <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t p-4 pb-10 z-40">
-        <div class="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div>
-            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">ยอดรวมทั้งสิ้น</p>
-            <p class="text-2xl font-black text-magenta leading-tight">
-              {{ totalAmount.toLocaleString() }} <span class="text-xs font-normal text-gray-500">บาท</span>
-            </p>
-          </div>
-          <button @click="submitForm" class="bg-success text-white px-10 py-3.5 rounded-2xl font-bold shadow-lg shadow-success/20 active:scale-95 transition-all">
-            กดบันทึกข้อมูล
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script>
-    const { createApp, ref, computed, onMounted } = Vue
-    createApp({
-      setup() {
-        const isLoaded = ref(false)
-        const showSelector = ref(true)
-        const selectedNames = ref([])
-        const donors = ref([{ name: '', amount: null }])
+    async function main() {
+      try {
+        // 1. init LIFF
+        await liff.init({ liffId: "YOUR_LIFF_ID" });
 
-        const confirmSelection = () => {
-          if (selectedNames.value.length > 0) {
-            donors.value = selectedNames.value.map(name => ({ name, amount: null }));
-          }
-          showSelector.value = false;
+        // 2. ถ้ายังไม่ได้ login → login
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
         }
 
-        onMounted(async () => {
-          // สั่งปิด Loader ทันทีที่ Vue พร้อม (แก้หน้าขาว)
-          const loader = document.getElementById('first-loader');
-          if (loader) {
-            loader.classList.add('fade-out');
-            setTimeout(() => { loader.style.display = 'none'; }, 500);
-          }
+        // 3. ดึงข้อมูล user
+        const profile = await liff.getProfile();
 
-          try {
-            await liff.init({ liffId: "2009694352-LHMu0lor" });
-            const urlParams = new URLSearchParams(window.location.search);
-            // ถ้าเป็นโหมดแก้ไข ไม่ต้องโชว์ตัวเลือก
-            if (urlParams.get('mode') === 'edit') showSelector.value = false;
+        const userId = profile.userId;
+        const name = profile.displayName;
 
-            if (!liff.isLoggedIn()) {
-              liff.login();
-            } else {
-              isLoaded.value = true;
-            }
-          } catch (err) {
-            console.error("LIFF Error:", err);
-          }
-        });
+        // 4. แสดงผล
+        alert(
+          "✅ ดึงข้อมูลสำเร็จ\n\n" +
+          "userId: " + userId + "\n" +
+          "name: " + name
+        );
 
-        const totalAmount = computed(() => donors.value.reduce((sum, p) => sum + (Number(p.amount) || 0), 0))
-        const addPerson = () => donors.value.push({ name: '', amount: null })
-        const removePerson = (index) => { if (donors.value.length > 1) donors.value.splice(index, 1) }
-        const handleFocus = (event) => {
-          setTimeout(() => { event.target.scrollIntoView({ behavior: 'smooth', block: 'center' }) }, 400)
-        }
+        // (optional) แสดงบนหน้าเว็บด้วย
+        document.body.innerHTML = `
+          <h2>สำเร็จ 🎉</h2>
+          <p><b>userId:</b> ${userId}</p>
+          <p><b>name:</b> ${name}</p>
+        `;
 
-       const submitForm = async () => {
-          try {
-            const itemList = donors.value.map(p => ({
-              "type": "box", "layout": "horizontal",
-              "contents": [
-                { "type": "text", "text": p.name || 'ไม่ระบุชื่อ', "size": "sm", "color": "#666699", "flex": 4, "wrap": true },
-                { "type": "text", "text": (p.amount || 0).toLocaleString() + " บาท", "size": "sm", "align": "end", "color": "#666699", "weight": "bold", "flex": 3 }
-              ]
-            }));
-
-            const flexSummary = {
-              "type": "bubble",
-              "header": {
-                "type": "box", "layout": "vertical",
-                "contents": [{ 
-                  "type": "text", 
-                  "text": "📋 สรุปรายการทำบุญ", 
-                  "weight": "bold", 
-                  "size": "lg",
-                  "color": "#ffffff" // Header Font เป็นสีขาว
-                }],
-                "backgroundColor": "#9966ff" // Header Background (ลบจุดออกแล้ว)
-              },
-              "body": {
-                "type": "box", "layout": "vertical", "spacing": "md",
-                "contents": [
-                  { "type": "box", "layout": "vertical", "spacing": "sm", "contents": itemList },
-                  { "type": "separator", "margin": "lg" },
-                  {
-                    "type": "box", "layout": "horizontal", "margin": "md",
-                    "contents": [
-                      { "type": "text", "text": "ยอดรวมทั้งสิ้น", "weight": "bold", "size": "md", "color": "#cc3399" },
-                      { "type": "text", "text": totalAmount.value.toLocaleString() + " บาท", "weight": "bold", "size": "md", "align": "end", "color": "#ff00ff" }
-                    ]
-                  },
-                  {
-                    "type": "box", "layout": "vertical",
-                    "contents": [{ "type": "text", "text": "สถานะ: รอโอน", "size": "xs", "color": "#ffffff", "align": "center", "weight": "bold" }],
-                    "backgroundColor": "#F8d7da", "cornerRadius": "md", "paddingAll": "4px", "margin": "xl"
-                  }
-                ]
-              },
-              "footer": {
-                "type": "box", "layout": "vertical",
-                "contents": [{
-                  "type": "button",
-                  "action": { "type": "uri", "label": "แก้ไขรายการ", "uri": "https://liff.line.me/2009694352-LHMu0lor?mode=edit" },
-                  "style": "link", "color": "#6200ea"
-                }]
-              }
-            };
-
-            if (liff.isInClient()) {
-              await liff.sendMessages([{ "type": "flex", "altText": "สรุปรายการทำบุญ", "contents": flexSummary }]);
-              liff.closeWindow();
-            } else {
-              alert("บันทึกเรียบร้อย ยอดรวม: " + totalAmount.value.toLocaleString() + " บาท");
-            }
-          } catch (err) {
-            alert("Error: " + err.message);
-          }
-        };
-
-        return { isLoaded, showSelector, selectedNames, confirmSelection, donors, totalAmount, addPerson, removePerson, submitForm, handleFocus }
+      } catch (err) {
+        alert("❌ ERROR: " + err.message);
+        console.error(err);
       }
-    }).mount('#app')
+    }
+
+    main();
   </script>
 </body>
 </html>
