@@ -96,7 +96,10 @@
       await liff.sendMessages([
         {
           type: "text",
-          text: "บันทึกเรียบร้อย เลขที่: " + data.donateId
+           text:
+          "✅ บันทึกเรียบร้อย\n" +
+          "💰 จำนวน: " + amount + " บาท\n" +
+          "🧾 เลขที่: " + data.donateId
         }
       ]);
 
