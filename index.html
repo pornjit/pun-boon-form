@@ -2,62 +2,90 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>แบบฟอร์มออกใบอนุโมทนาบัตร</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ฟอร์มทำบุญ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- LIFF SDK -->
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-
 <body class="p-3">
 
 <div class="container">
   <h4 class="mb-3">กรอกข้อมูลทำบุญ</h4>
 
-  <input id="name" class="form-control mb-2" placeholder="ชื่อ-สกุล">
-  <input id="amount" type="number" class="form-control mb-3" placeholder="ยอดเงิน">
+  <form id="donateForm">
+    <div class="mb-3">
+      <label>ชื่อ - นามสกุล</label>
+      <input type="text" id="name" class="form-control" required>
+    </div>
 
-  <button class="btn btn-primary w-100" onclick="submitForm()">บันทึก</button>
+    <div class="mb-3">
+      <label>ยอดเงิน</label>
+      <input type="number" id="amount" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-100">บันทึก</button>
+  </form>
 </div>
 
 <script>
-async function submitForm() {
-  await liff.init({ liffId: "2009694352-LHMu0lor" });
+  const LIFF_ID = "2009694352-LHMu0lor"; // 🔥 ใส่ของจริง
 
-  if (!liff.isLoggedIn()) {
-    liff.login();
-    return;
+  async function main() {
+    await liff.init({ liffId: LIFF_ID });
+
+    if (!liff.isLoggedIn()) {
+      liff.login();
+      return;
+    }
+
+    const profile = await liff.getProfile();
+
+    document.getElementById("donateForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const amount = document.getElementById("amount").value;
+
+      alert("กำลังบันทึก...");
+
+      try {
+        const res = await fetch("https://linebot-donate.onrender.com/save", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            userId: profile.userId,
+            name: name,
+            amount: amount
+          })
+        });
+
+        const data = await res.json();
+
+        alert("บันทึกสำเร็จ ID: " + data.donateId);
+
+        // ส่งกลับไปแชท
+        await liff.sendMessages([
+          {
+            type: "text",
+            text: "บันทึกแล้ว ID: " + data.donateId
+          }
+        ]);
+
+        liff.closeWindow();
+
+      } catch (err) {
+        alert("ERROR: " + err.message);
+      }
+    });
   }
 
-  const profile = await liff.getProfile();
-
-  const name = document.getElementById("name").value;
-  const amount = document.getElementById("amount").value;
-
-  const res = await fetch("https://linebot-donate.onrender.com/save", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      userId: profile.userId,
-      name: name,
-      amount: amount
-    })
-  });
-
-  const data = await res.json();
-
-  // ส่งกลับไปแชท
-  await liff.sendMessages([
-    {
-      type: "text",
-      text: "เลขรายการ: " + data.donateId + "\nกรุณาส่งสลิปค่ะ"
-    }
-  ]);
-
-  liff.closeWindow();
-}
+  main();
 </script>
 
 </body>
